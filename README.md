@@ -4,7 +4,7 @@ Complete ride-sharing backend API built with Node.js, Express, MySQL, Redis, and
 
 ## Tech Stack
 
-- **Runtime**: Node.js 18
+- **Runtime**: Node.js 22
 - **Framework**: Express.js
 - **Database**: MySQL 8.0 (mysql2)
 - **Cache**: Redis 7 (ioredis)
@@ -15,7 +15,7 @@ Complete ride-sharing backend API built with Node.js, Express, MySQL, Redis, and
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 22+
 - MySQL 8.0
 - Redis 7
 - npm or yarn
@@ -40,16 +40,31 @@ cp .env.example .env
 
 4. Configure `.env` with your settings:
 ```env
+# Server Configuration
 PORT=3000
+HOST=0.0.0.0
 NODE_ENV=development
+
+# Database
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_password
 DB_NAME=routemate_db
+
+# Redis
 REDIS_HOST=localhost
 REDIS_PORT=6379
+
+# JWT
 JWT_SECRET=your-secret-key-here
+
+# Network Security
+ALLOWED_ORIGINS=http://localhost:3000,http://192.168.1.100:3000
+TRUSTED_NETWORKS=192.168.0.0/16,10.0.0.0/8,172.16.0.0/12
+ENABLE_NETWORK_RESTRICTION=false
+ENABLE_IP_WHITELIST=false
+MAX_REQUESTS_PER_MINUTE=100
 ```
 
 5. Create database and run migrations:
@@ -66,6 +81,39 @@ mkdir uploads
 ```bash
 npm run dev
 ```
+
+## Network Configuration
+
+### Server Access
+The server binds to `0.0.0.0:3000` allowing connections from:
+- Local machine (localhost)
+- Same network devices (192.168.x.x, 10.x.x.x)
+- External networks (if firewall configured)
+
+### Firewall Setup
+
+#### Windows
+```cmd
+netsh advfirewall firewall add rule name="RouteMate Backend" dir=in action=allow protocol=TCP localport=3000
+```
+
+#### Linux/Mac
+```bash
+# UFW
+sudo ufw allow 3000
+
+# iptables
+sudo iptables -A INPUT -p tcp --dport 3000 -j ACCEPT
+```
+
+### Network Security Features
+- **IP Whitelisting**: Restrict access to specific IPs
+- **Trusted Networks**: Allow access from specific network ranges
+- **Rate Limiting**: Different limits for auth, admin, and general endpoints
+- **CORS Protection**: Configurable allowed origins
+- **Suspicious Activity Detection**: Automatic threat detection
+
+See [NETWORK_SECURITY.md](NETWORK_SECURITY.md) for detailed configuration.
 
 ## Docker Deployment
 
@@ -88,9 +136,15 @@ Content-Type: application/json
   "firstName": "John",
   "lastName": "Doe",
   "phoneNumber": "+1234567890",
-  "userType": "both"
+  "userType": "both",
+  "role": "PASSENGER"
 }
 ```
+
+**Roles:**
+- `ADMIN`: Full system access
+- `DRIVER`: Can create routes, accept rides, manage trips
+- `PASSENGER`: Can search routes, request rides
 
 #### Login
 ```http
@@ -100,6 +154,22 @@ Content-Type: application/json
 {
   "email": "user@example.com",
   "password": "password123"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "userId": 1,
+    "name": "John Doe",
+    "email": "user@example.com",
+    "role": "PASSENGER",
+    "trustScore": "2.50",
+    "accessToken": "jwt-access-token",
+    "refreshToken": "jwt-refresh-token"
+  }
 }
 ```
 
@@ -277,6 +347,25 @@ Content-Type: application/json
 
 {
   "status": "approved"
+}
+```
+
+### Admin Operations
+
+#### Get All Users (Admin Only)
+```http
+GET /admin/users?limit=50&offset=0
+Authorization: Bearer <admin-access-token>
+```
+
+#### Update User Role (Admin Only)
+```http
+PUT /admin/users/:userId/role
+Authorization: Bearer <admin-access-token>
+Content-Type: application/json
+
+{
+  "role": "DRIVER"
 }
 ```
 

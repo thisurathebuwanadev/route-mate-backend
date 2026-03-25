@@ -38,7 +38,8 @@ const schemas = {
     firstName: Joi.string().min(2).max(100).required(),
     lastName: Joi.string().min(2).max(100).required(),
     phoneNumber: Joi.string().pattern(/^[0-9+\-\s()]+$/).required(),
-    userType: Joi.string().valid('driver', 'passenger', 'both').required()
+    userType: Joi.string().valid('driver', 'passenger', 'both').required(),
+    role: Joi.string().valid('ADMIN', 'PASSENGER', 'DRIVER').default('PASSENGER')
   }),
 
   login: Joi.object({

@@ -12,6 +12,9 @@
   "keywords": ["ride-sharing", "carpooling", "express"],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "dependencies": {
     "express": "^4.18.2",
     "mysql2": "^3.6.5",

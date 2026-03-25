@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const verificationController = require('../controllers/verificationController');
 const authMiddleware = require('../middleware/authMiddleware');
+const { requireAdmin, requireDriverOrPassenger } = require('../middleware/roleMiddleware');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -29,8 +30,8 @@ const upload = multer({
   }
 });
 
-router.post('/upload-document', authMiddleware, upload.single('document'), verificationController.uploadDocument);
-router.get('/status', authMiddleware, verificationController.getStatus);
-router.put('/review/:id', authMiddleware, verificationController.reviewDocument);
+router.post('/upload-document', authMiddleware, requireDriverOrPassenger, upload.single('document'), verificationController.uploadDocument);
+router.get('/status', authMiddleware, requireDriverOrPassenger, verificationController.getStatus);
+router.put('/review/:id', authMiddleware, requireAdmin, verificationController.reviewDocument);
 
 module.exports = router;
