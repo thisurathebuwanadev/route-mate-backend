@@ -24,13 +24,13 @@ class DriverController {
 
       const routeId = await routeRepository.create({
         driverId: req.user.userId,
-        vehicleId: req.body.vehicleId,
+        vehicleId: vehicle.vehicle_id,
         startLatitude: req.body.startLatitude,
         startLongitude: req.body.startLongitude,
         endLatitude: req.body.endLatitude,
         endLongitude: req.body.endLongitude,
-        startAddress: req.body.startAddress,
-        endAddress: req.body.endAddress,
+        startAddress: req.body.startAddress || null,
+        endAddress: req.body.endAddress || null,
         estimatedDistance: distance,
         estimatedDuration: Math.round(distance * 2),
         departureTime: req.body.departureTime,

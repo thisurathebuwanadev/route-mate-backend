@@ -54,7 +54,6 @@ const schemas = {
   }),
 
   createRoute: Joi.object({
-    vehicleId: Joi.number().integer().required(),
     startLatitude: Joi.number().min(-90).max(90).required(),
     startLongitude: Joi.number().min(-180).max(180).required(),
     endLatitude: Joi.number().min(-90).max(90).required(),

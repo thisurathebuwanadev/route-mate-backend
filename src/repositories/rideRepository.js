@@ -65,7 +65,7 @@ class RideRepository {
   }
 
   async findVehicleByUser(userId) {
-    const [rows] = await db.execute('SELECT * FROM vehicles WHERE user_id = ? AND is_active = true', [userId]);
+    const [rows] = await db.execute('SELECT * FROM vehicles WHERE user_id = ? AND is_active = 1', [userId]);
     return rows[0];
   }
 }
