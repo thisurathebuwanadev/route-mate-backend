@@ -53,7 +53,7 @@ const schemas = {
     profileImageUrl: Joi.string().uri()
   }),
 
-  goOnline: Joi.object({
+  createRoute: Joi.object({
     vehicleId: Joi.number().integer().required(),
     startLatitude: Joi.number().min(-90).max(90).required(),
     startLongitude: Joi.number().min(-180).max(180).required(),

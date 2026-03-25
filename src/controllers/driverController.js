@@ -5,7 +5,7 @@ const routeMatchingService = require('../services/routeMatchingService');
 const { NotFoundError } = require('../errors/AppErrors');
 
 class DriverController {
-  async goOnline(req, res, next) {
+  async createRoute(req, res, next) {
     try {
       const vehicle = await rideRepository.findVehicleByUser(req.user.userId);
       if (!vehicle) throw new NotFoundError('No active vehicle found');
