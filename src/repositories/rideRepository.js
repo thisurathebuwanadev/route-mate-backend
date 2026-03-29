@@ -41,6 +41,21 @@ class RideRepository {
     );
   }
 
+  async findIncomingForDriver(driverId) {
+    const [rows] = await db.execute(
+      `SELECT rr.request_id, CONCAT(u.first_name, ' ', u.last_name) AS passenger_name,
+       rr.pickup_address, rr.passenger_count, rr.estimated_cost,
+       rr.pickup_latitude, rr.pickup_longitude, r.start_latitude, r.start_longitude
+       FROM ride_requests rr
+       JOIN routes r ON rr.route_id = r.route_id
+       JOIN users u ON rr.passenger_id = u.user_id
+       WHERE r.driver_id = ? AND rr.request_status = 'pending' AND r.route_status = 'active'
+       ORDER BY rr.requested_at DESC`,
+      [driverId]
+    );
+    return rows;
+  }
+
   async findHistoryByUser(userId, limit, offset) {
     const [rows] = await db.execute(
       `SELECT rr.*, r.start_address, r.end_address, r.departure_time, 

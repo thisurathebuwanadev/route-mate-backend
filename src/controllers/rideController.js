@@ -87,6 +87,25 @@ class RideController {
     }
   }
 
+  async getIncomingRequests(req, res, next) {
+    try {
+      const rows = await rideRepository.findIncomingForDriver(req.user.userId);
+      const data = rows.map(r => ({
+        id: String(r.request_id),
+        passengerName: r.passenger_name,
+        pickupAddress: r.pickup_address,
+        passengerCount: r.passenger_count,
+        estimatedCost: r.estimated_cost,
+        distanceFromDriverKm: parseFloat(routeMatchingService.haversineDistance(
+          r.start_latitude, r.start_longitude, r.pickup_latitude, r.pickup_longitude
+        ).toFixed(1))
+      }));
+      res.json({ success: true, data });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getHistory(req, res, next) {
     try {
       const limit = parseInt(req.query.limit) || 20;
