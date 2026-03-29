@@ -106,6 +106,45 @@ class RideController {
     }
   }
 
+  _mapRideRows(rows, statusLabel) {
+    return rows.map(r => ({
+      id: String(r.request_id),
+      route: `${r.start_address} → ${r.end_address}`,
+      passengers: r.passenger_count,
+      distanceKm: parseFloat(Number(r.estimated_distance || 0).toFixed(1)),
+      fare: r.estimated_cost,
+      status: statusLabel,
+      time: r.departure_time
+    }));
+  }
+
+  async getActiveRequests(req, res, next) {
+    try {
+      const rows = await rideRepository.findByDriverAndStatus(req.user.userId, 'accepted');
+      res.json({ success: true, data: this._mapRideRows(rows, 'Upcoming') });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCompletedRequests(req, res, next) {
+    try {
+      const rows = await rideRepository.findByDriverAndStatus(req.user.userId, 'completed');
+      res.json({ success: true, data: this._mapRideRows(rows, 'Completed') });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCancelledRequests(req, res, next) {
+    try {
+      const rows = await rideRepository.findByDriverAndStatus(req.user.userId, 'cancelled');
+      res.json({ success: true, data: this._mapRideRows(rows, 'Cancelled') });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getHistory(req, res, next) {
     try {
       const limit = parseInt(req.query.limit) || 20;
