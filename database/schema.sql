@@ -106,3 +106,19 @@ CREATE TABLE carbon_savings (
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
   FOREIGN KEY (ride_request_id) REFERENCES ride_requests(request_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+-- Driver Locations Table
+CREATE TABLE driver_locations (
+  location_id INT PRIMARY KEY AUTO_INCREMENT,
+  driver_id INT NOT NULL,
+  route_id INT NOT NULL,
+  session_id CHAR(36) NOT NULL,
+  latitude DECIMAL(10,8) NOT NULL,
+  longitude DECIMAL(11,8) NOT NULL,
+  recorded_at DATETIME NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (driver_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (route_id) REFERENCES routes(route_id) ON DELETE CASCADE,
+  INDEX idx_driver_session (driver_id, session_id),
+  INDEX idx_recorded_at (recorded_at)
+) ENGINE=InnoDB;

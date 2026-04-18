@@ -1,5 +1,6 @@
 const routeRepository = require('../repositories/routeRepository');
 const rideRepository = require('../repositories/rideRepository');
+const driverLocationRepository = require('../repositories/driverLocationRepository');
 const costCalculatorService = require('../services/costCalculatorService');
 const routeMatchingService = require('../services/routeMatchingService');
 const { NotFoundError } = require('../errors/AppErrors');
@@ -52,9 +53,26 @@ class DriverController {
     }
   }
 
+  async markLocation(req, res, next) {
+    try {
+      const id = await driverLocationRepository.create({
+        driverId: req.user.userId,
+        routeId: req.body.routeId,
+        sessionId: req.body.sessionId,
+        lat: req.body.lat,
+        lng: req.body.lng,
+        datetime: req.body.datetime
+      });
+      res.status(201).json({ success: true, data: { locationId: id } });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getRoutes(req, res, next) {
     try {
       const routes = await routeRepository.findActiveByDriver(req.user.userId);
+      console.log("routes : ", routes)
       res.json({ success: true, data: routes });
     } catch (error) {
       next(error);
