@@ -1,6 +1,6 @@
 const routeRepository = require('../repositories/routeRepository');
 const rideRepository = require('../repositories/rideRepository');
-const driverLocationRepository = require('../repositories/driverLocationRepository');
+const routePointRepository = require('../repositories/routePointRepository');
 const costCalculatorService = require('../services/costCalculatorService');
 const routeMatchingService = require('../services/routeMatchingService');
 const { NotFoundError } = require('../errors/AppErrors');
@@ -55,7 +55,7 @@ class DriverController {
 
   async markLocation(req, res, next) {
     try {
-      const id = await driverLocationRepository.create({
+      const id = await routePointRepository.create({
         driverId: req.user.userId,
         routeId: req.body.routeId,
         sessionId: req.body.sessionId,

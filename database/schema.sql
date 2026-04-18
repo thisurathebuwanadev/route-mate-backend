@@ -107,9 +107,9 @@ CREATE TABLE carbon_savings (
   FOREIGN KEY (ride_request_id) REFERENCES ride_requests(request_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- Driver Locations Table
-CREATE TABLE driver_locations (
-  location_id INT PRIMARY KEY AUTO_INCREMENT,
+-- Route Points Table
+CREATE TABLE route_points (
+  point_id INT PRIMARY KEY AUTO_INCREMENT,
   driver_id INT NOT NULL,
   route_id INT NOT NULL,
   session_id CHAR(36) NOT NULL,
