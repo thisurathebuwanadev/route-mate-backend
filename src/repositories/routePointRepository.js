@@ -8,6 +8,14 @@ class RoutePointRepository {
     );
     return result.insertId;
   }
+
+  async findByRouteId(routeId) {
+    const [rows] = await db.execute(
+      'SELECT latitude, longitude FROM route_points WHERE route_id = ? ORDER BY recorded_at ASC',
+      [routeId]
+    );
+    return rows;
+  }
 }
 
 module.exports = new RoutePointRepository();

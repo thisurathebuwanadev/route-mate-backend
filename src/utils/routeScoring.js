@@ -12,9 +12,38 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function scoreRoute({ startLat, startLng, endLat, endLng }, route) {
-  const startDist = haversineDistance(startLat, startLng, route.start_latitude, route.start_longitude);
-  const endDist = haversineDistance(endLat, endLng, route.end_latitude, route.end_longitude);
+function scoreRoute({ startLat, startLng, endLat, endLng }, route, routePoints) {
+  let startDist, endDist;
+
+  if (routePoints && routePoints.length > 0) {
+    // Find first route point within MAX_KM of passenger's start
+    let startMatchIndex = -1;
+    for (let i = 0; i < routePoints.length; i++) {
+      const dist = haversineDistance(startLat, startLng, routePoints[i].latitude, routePoints[i].longitude);
+      if (dist <= MAX_KM) {
+        startDist = dist;
+        startMatchIndex = i;
+        break;
+      }
+    }
+    if (startMatchIndex === -1) return null;
+
+    // From matched index onward, find a route point within MAX_KM of passenger's end
+    let endMatched = false;
+    for (let i = startMatchIndex; i < routePoints.length; i++) {
+      const dist = haversineDistance(endLat, endLng, routePoints[i].latitude, routePoints[i].longitude);
+      if (dist <= MAX_KM) {
+        endDist = dist;
+        endMatched = true;
+        break;
+      }
+    }
+    if (!endMatched) return null;
+  } else {
+    // Fallback to route start/end when no route points exist
+    startDist = haversineDistance(startLat, startLng, route.start_latitude, route.start_longitude);
+    endDist = haversineDistance(endLat, endLng, route.end_latitude, route.end_longitude);
+  }
 
   const startScore = Math.max(0, 1 - startDist / MAX_KM);
   const endScore = Math.max(0, 1 - endDist / MAX_KM);

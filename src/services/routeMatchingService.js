@@ -1,4 +1,5 @@
 const routeRepository = require('../repositories/routeRepository');
+const routePointRepository = require('../repositories/routePointRepository');
 const redis = require('../config/redis');
 const crypto = require('crypto');
 const { haversineDistance, scoreRoute } = require('../utils/routeScoring');
@@ -14,7 +15,8 @@ class RouteMatchingService {
     const passenger = { startLat: startLatitude, startLng: startLongitude, endLat: endLatitude, endLng: endLongitude };
 
     for (const route of candidates) {
-      const score = scoreRoute(passenger, route);
+      const routePoints = await routePointRepository.findByRouteId(route.route_id);
+      const score = scoreRoute(passenger, route, routePoints);
       if (!score) continue;
 
       matches.push({
