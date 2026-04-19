@@ -4,13 +4,13 @@ class RouteRepository {
   async create(routeData) {
     const [result] = await db.execute(
       `INSERT INTO routes (driver_id, vehicle_id, start_latitude, start_longitude, end_latitude, end_longitude, 
-       start_address, end_address, estimated_distance, estimated_duration, departure_time, available_seats, cost_per_passenger) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       start_address, end_address, estimated_distance, estimated_duration, departure_time, days, available_seats, cost_per_passenger) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         routeData.driverId, routeData.vehicleId, routeData.startLatitude, routeData.startLongitude,
         routeData.endLatitude, routeData.endLongitude, routeData.startAddress, routeData.endAddress,
         routeData.estimatedDistance, routeData.estimatedDuration, routeData.departureTime,
-        routeData.availableSeats, routeData.costPerPassenger
+        routeData.days, routeData.availableSeats, routeData.costPerPassenger
       ]
     );
     return result.insertId;

@@ -24,6 +24,11 @@ class DriverController {
         fuelEfficiency: vehicle.fuel_efficiency
       });
 
+      console.log("DAYSSSSSS: ", req.body.days)
+
+      // Convert days array to comma-separated string for DB
+      const daysString = req.body.days.join(',');
+
       const routeId = await routeRepository.create({
         driverId: req.user.userId,
         vehicleId: vehicle.vehicle_id,
@@ -36,6 +41,7 @@ class DriverController {
         estimatedDistance: distance,
         estimatedDuration: Math.round(distance * 2),
         departureTime: req.body.departureTime,
+        days: daysString,
         availableSeats: req.body.availableSeats,
         costPerPassenger: fare.costPerPassenger
       });
@@ -46,7 +52,8 @@ class DriverController {
           routeId,
           estimatedDistance: parseFloat(distance.toFixed(2)),
           costPerPassenger: fare.costPerPassenger,
-          totalCost: fare.totalCost
+          totalCost: fare.totalCost,
+          days: req.body.days
         }
       });
     } catch (error) {

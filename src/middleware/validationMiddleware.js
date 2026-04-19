@@ -6,6 +6,9 @@ const sanitizeInput = (obj) => {
   if (typeof obj === 'string') {
     return sanitizeHtml(obj, { allowedTags: [], allowedAttributes: {} });
   }
+  if (Array.isArray(obj)) {
+    return obj.map(item => sanitizeInput(item));
+  }
   if (typeof obj === 'object' && obj !== null) {
     const sanitized = {};
     for (const key in obj) {
@@ -62,7 +65,10 @@ const schemas = {
     startAddress: Joi.string().max(500),
     endAddress: Joi.string().max(500),
     departureTime: Joi.string().pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/).required(),
-    availableSeats: Joi.number().integer().min(1).required()
+    availableSeats: Joi.number().integer().min(1).required(),
+    days: Joi.array().items(
+      Joi.string().valid('MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN')
+    ).min(1).required()
   }),
 
   searchRoutes: Joi.object({
