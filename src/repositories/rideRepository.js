@@ -98,6 +98,16 @@ class RideRepository {
     const [rows] = await db.execute('SELECT * FROM vehicles WHERE user_id = ? AND is_active = 1', [userId]);
     return rows[0];
   }
+
+  async findVehiclesByUser(userId) {
+    const [rows] = await db.execute('SELECT * FROM vehicles WHERE user_id = ? AND is_active = 1', [userId]);
+    return rows;
+  }
+
+  async findVehicleById(vehicleId) {
+    const [rows] = await db.execute('SELECT * FROM vehicles WHERE vehicle_id = ? AND is_active = 1', [vehicleId]);
+    return rows[0];
+  }
 }
 
 module.exports = new RideRepository();

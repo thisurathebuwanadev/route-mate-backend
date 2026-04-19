@@ -54,6 +54,7 @@ const schemas = {
   }),
 
   createRoute: Joi.object({
+    vehicleId: Joi.number().integer().required(),
     startLatitude: Joi.number().min(-90).max(90).required(),
     startLongitude: Joi.number().min(-180).max(180).required(),
     endLatitude: Joi.number().min(-90).max(90).required(),
@@ -99,6 +100,15 @@ const schemas = {
     routeId: Joi.number().integer().required(),
     latitude: Joi.number().min(-90).max(90).required(),
     longitude: Joi.number().min(-180).max(180).required()
+  }),
+
+  addVehicle: Joi.object({
+    vehicle_type: Joi.string().valid('bike', 'car', 'van').required(),
+    make: Joi.string().max(50).required(),
+    model: Joi.string().max(50).required(),
+    license_plate: Joi.string().max(20).required(),
+    capacity: Joi.number().integer().min(1).required(),
+    fuel_efficiency: Joi.number().positive().required()
   })
 };
 

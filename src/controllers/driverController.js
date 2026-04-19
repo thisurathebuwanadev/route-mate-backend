@@ -8,8 +8,9 @@ const { NotFoundError } = require('../errors/AppErrors');
 class DriverController {
   async createRoute(req, res, next) {
     try {
-      const vehicle = await rideRepository.findVehicleByUser(req.user.userId);
-      if (!vehicle) throw new NotFoundError('No active vehicle found');
+      const vehicle = await rideRepository.findVehicleById(req.body.vehicleId);
+      if (!vehicle) throw new NotFoundError('Vehicle not found');
+      if (vehicle.user_id !== req.user.userId) throw new NotFoundError('Vehicle not owned by user');
 
       const { startLatitude, startLongitude, endLatitude, endLongitude } = req.body;
       const distance = routeMatchingService.haversineDistance(
@@ -72,8 +73,34 @@ class DriverController {
   async getRoutes(req, res, next) {
     try {
       const routes = await routeRepository.findActiveByDriver(req.user.userId);
-      console.log("routes : ", routes)
+      // console.log("routes : ", routes)
       res.json({ success: true, data: routes });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addVehicle(req, res, next) {
+    try {
+      const vehicleId = await rideRepository.createVehicle({
+        userId: req.user.userId,
+        vehicleType: req.body.vehicle_type,
+        make: req.body.make,
+        model: req.body.model,
+        licensePlate: req.body.license_plate,
+        capacity: req.body.capacity,
+        fuelEfficiency: req.body.fuel_efficiency
+      });
+      res.status(201).json({ success: true, data: { vehicleId } });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getVehicles(req, res, next) {
+    try {
+      const vehicles = await rideRepository.findVehiclesByUser(req.user.userId);
+      res.json({ success: true, data: vehicles });
     } catch (error) {
       next(error);
     }
