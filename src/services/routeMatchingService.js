@@ -5,12 +5,13 @@ const crypto = require('crypto');
 const { haversineDistance, scoreRoute } = require('../utils/routeScoring');
 
 class RouteMatchingService {
-  async searchRoutes({ startLatitude, startLongitude, endLatitude, endLongitude, departureTime, passengerCount }) {
-    const cacheKey = this.generateCacheKey({ startLatitude, startLongitude, endLatitude, endLongitude, departureTime, passengerCount });
+  async searchRoutes({ startLatitude, startLongitude, endLatitude, endLongitude, departureTime, passengerCount, days }) {
+    console.log("Searching routes with params:", { startLatitude, startLongitude, endLatitude, endLongitude, departureTime, passengerCount, days })
+    const cacheKey = this.generateCacheKey({ startLatitude, startLongitude, endLatitude, endLongitude, departureTime, passengerCount, days });
     const cached = await redis.get(cacheKey);
     if (cached) return JSON.parse(cached);
 
-    const candidates = await routeRepository.searchActiveRoutes(departureTime, passengerCount);
+    const candidates = await routeRepository.searchActiveRoutes(departureTime, passengerCount, days);
     const matches = [];
     const passenger = { startLat: startLatitude, startLng: startLongitude, endLat: endLatitude, endLng: endLongitude };
 

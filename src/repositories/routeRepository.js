@@ -39,12 +39,21 @@ class RouteRepository {
     return rows;
   }
 
-  async searchActiveRoutes(departureTime, passengerCount) {
+  async searchActiveRoutes(departureTime, passengerCount, days) {
     const timeStart = new Date(`1970-01-01 ${departureTime}`);
     timeStart.setMinutes(timeStart.getMinutes() - 30);
     const timeEnd = new Date(`1970-01-01 ${departureTime}`);
     timeEnd.setMinutes(timeEnd.getMinutes() + 30);
+    console.log("departureTime: " + departureTime);
+    console.log("timeStart111: " + timeStart.toString());
+    console.log("timeEnd111: " + timeEnd.toString());
+    console.log("timeStart: " + timeStart.toTimeString().slice(0, 8));
+    console.log("timeEnd: " + timeEnd.toTimeString().slice(0, 8));
 
+    const dayConditions = days.map(() => 'r.days LIKE ?');
+    const dayValues = days.map(day => `%${day}%`);
+    console.log(dayConditions.join(' OR '));
+    console.log ("dayValues: " + dayValues);
     const [rows] = await db.execute(
       `SELECT r.*, v.vehicle_type, v.fuel_efficiency, u.first_name, u.last_name, u.trust_score 
        FROM routes r 
@@ -52,8 +61,9 @@ class RouteRepository {
        JOIN users u ON r.driver_id = u.user_id 
        WHERE r.route_status = 'active' 
        AND r.available_seats >= ? 
-       AND r.departure_time BETWEEN ? AND ?`,
-      [passengerCount, timeStart.toTimeString().slice(0, 8), timeEnd.toTimeString().slice(0, 8)]
+       AND r.departure_time BETWEEN ? AND ?
+       AND (${dayConditions.join(' OR ')})`,
+      [passengerCount, timeStart.toTimeString().slice(0, 8), timeEnd.toTimeString().slice(0, 8), ...dayValues]
     );
     return rows;
   }

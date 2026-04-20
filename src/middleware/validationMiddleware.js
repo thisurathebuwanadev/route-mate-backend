@@ -77,7 +77,10 @@ const schemas = {
     endLatitude: Joi.number().min(-90).max(90).required(),
     endLongitude: Joi.number().min(-180).max(180).required(),
     departureTime: Joi.string().pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/).required(),
-    passengerCount: Joi.number().integer().min(1).default(1)
+    passengerCount: Joi.number().integer().min(1).default(1),
+    days: Joi.array().items(
+      Joi.string().valid('MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN')
+    ).min(1).required()
   }),
 
   rideRequest: Joi.object({
