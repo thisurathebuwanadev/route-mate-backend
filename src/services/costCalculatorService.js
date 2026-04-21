@@ -2,8 +2,8 @@ const config = require('../config/env');
 
 class CostCalculatorService {
   calculateFare({ vehicleType, distanceKm, passengerCount, fuelEfficiency }) {
-    const baseRates = { bike: 0.50, car: 1.20, van: 1.80 };
-    const baseRate = baseRates[vehicleType] || 1.20;
+    const baseRates = { bike: 30.00, car: 50.00, van: 60.00 };
+    const baseRate = baseRates[vehicleType] || 50.00;
     
     const baseCost = distanceKm * baseRate;
     const fuelCost = fuelEfficiency ? (distanceKm / fuelEfficiency) * config.fuelPricePerLiter : 0;

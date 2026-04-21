@@ -6,7 +6,7 @@ class CarbonService {
     const emissionFactor = emissionFactors[vehicleType] || 0.21;
 
     const individualEmission = distanceKm * emissionFactor;
-    const sharedEmission = individualEmission / passengerCount;
+    const sharedEmission = individualEmission / (passengerCount + 1);
     const carbonSaved = individualEmission - sharedEmission;
 
     await verificationRepository.createCarbonSaving({
@@ -30,11 +30,11 @@ class CarbonService {
     const monthly = await verificationRepository.getMonthlyCarbonSavings(userId);
 
     return {
-      totalCarbonSaved: parseFloat((totals.total_saved || 0).toFixed(4)),
-      totalDistance: parseFloat((totals.total_distance || 0).toFixed(2)),
+      totalCarbonSaved: parseFloat((parseFloat(totals.total_saved) || 0).toFixed(4)),
+      totalDistance: parseFloat((parseFloat(totals.total_distance) || 0).toFixed(2)),
       monthlyBreakdown: monthly.map(m => ({
         month: m.month,
-        saved: parseFloat(m.saved.toFixed(4))
+        saved: parseFloat((parseFloat(m.saved) || 0).toFixed(4))
       }))
     };
   }

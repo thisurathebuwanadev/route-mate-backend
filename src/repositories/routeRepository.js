@@ -72,6 +72,14 @@ class RouteRepository {
     await db.execute('UPDATE routes SET available_seats = ? WHERE route_id = ?', [seats, routeId]);
   }
 
+  async getVehicleTypeByRouteId(routeId) {
+    const [rows] = await db.execute(
+      'SELECT v.vehicle_type FROM routes r LEFT JOIN vehicles v ON r.vehicle_id = v.vehicle_id WHERE r.route_id = ?',
+      [routeId]
+    );
+    return rows[0]?.vehicle_type;
+  }
+
   async updateStatus(routeId, status) {
     await db.execute('UPDATE routes SET route_status = ? WHERE route_id = ?', [status, routeId]);
   }

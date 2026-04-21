@@ -12,5 +12,6 @@ router.get('/active', authMiddleware, requireDriver, rideController.getActiveReq
 router.get('/completed', authMiddleware, requireDriver, rideController.getCompletedRequests.bind(rideController));
 router.get('/cancelled', authMiddleware, requireDriver, rideController.getCancelledRequests.bind(rideController));
 router.get('/history', authMiddleware, requireDriverOrPassenger, rideController.getHistory);
+router.get('/history/summary', authMiddleware, requireDriverOrPassenger, rideController.getHistorySummary);
 
 module.exports = router;

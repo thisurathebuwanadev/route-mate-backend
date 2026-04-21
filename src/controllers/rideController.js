@@ -2,6 +2,7 @@ const rideRepository = require('../repositories/rideRepository');
 const routeRepository = require('../repositories/routeRepository');
 const routeMatchingService = require('../services/routeMatchingService');
 const notificationService = require('../services/notificationService');
+const carbonService = require('../services/carbonService');
 const { NotFoundError, ConflictError } = require('../errors/AppErrors');
 
 class RideController {
@@ -34,6 +35,16 @@ class RideController {
         pickupAddress: req.body.pickupAddress,
         passengerCount: req.body.passengerCount,
         estimatedCost
+      });
+
+      const vehicleType = await routeRepository.getVehicleTypeByRouteId(req.body.routeId);
+      const distanceKm = parseFloat(route.estimated_distance) || 0;
+      await carbonService.calculateCarbonSaving({
+        distanceKm,
+        passengerCount: req.body.passengerCount,
+        vehicleType,
+        userId: req.user.userId,
+        rideRequestId: requestId
       });
 
       await notificationService.sendRideRequestNotification(route.driver_id, { requestId });
@@ -151,6 +162,24 @@ class RideController {
       const offset = parseInt(req.query.offset) || 0;
       const history = await rideRepository.findHistoryByUser(req.user.userId, limit, offset);
       res.json({ success: true, data: history });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getHistorySummary(req, res, next) {
+    try {
+      const summary = await rideRepository.getRideHistorySummary(req.user.userId);
+      const data = {
+        totalRides: parseInt(summary.totalRides) || 0,
+        totalRoutes: parseInt(summary.totalRoutes) || 0,
+        totalCost: parseFloat(summary.totalCost) || 0,
+        avgCost: parseFloat(summary.avgCost) || 0,
+        completedRides: parseInt(summary.completedRides) || 0,
+        cancelledRides: parseInt(summary.cancelledRides) || 0,
+        acceptedRides: parseInt(summary.acceptedRides) || 0
+      };
+      res.json({ success: true, data });
     } catch (error) {
       next(error);
     }

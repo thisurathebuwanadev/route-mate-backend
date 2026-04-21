@@ -80,8 +80,8 @@ class RideRepository {
        JOIN users u ON r.driver_id = u.user_id 
        WHERE rr.passenger_id = ? 
        ORDER BY rr.requested_at DESC 
-       LIMIT ? OFFSET ?`,
-      [userId, limit, offset]
+       LIMIT ${parseInt(limit)} OFFSET ${parseInt(offset)}`,
+      [userId]
     );
     return rows;
   }
@@ -102,6 +102,23 @@ class RideRepository {
   async findVehiclesByUser(userId) {
     const [rows] = await db.execute('SELECT * FROM vehicles WHERE user_id = ? AND is_active = 1', [userId]);
     return rows;
+  }
+
+  async getRideHistorySummary(userId) {
+    const [rows] = await db.execute(
+      `SELECT 
+         COUNT(*) as totalRides,
+         COUNT(DISTINCT rr.route_id) as totalRoutes,
+         SUM(rr.estimated_cost) as totalCost,
+         AVG(rr.estimated_cost) as avgCost,
+         COUNT(CASE WHEN rr.request_status = 'completed' THEN 1 END) as completedRides,
+         COUNT(CASE WHEN rr.request_status = 'cancelled' THEN 1 END) as cancelledRides,
+         COUNT(CASE WHEN rr.request_status = 'accepted' THEN 1 END) as acceptedRides
+       FROM ride_requests rr 
+       WHERE rr.passenger_id = ?`,
+      [userId]
+    );
+    return rows[0];
   }
 
   async findVehicleById(vehicleId) {
